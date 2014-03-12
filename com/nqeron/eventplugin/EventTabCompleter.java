@@ -42,7 +42,9 @@ public class EventTabCompleter implements TabCompleter{
 		   subCommand.equalsIgnoreCase("setTime")
 		   )
 		{  //looking for events?
-			return StringUtil.copyPartialMatches(args[1], plugin.getEventNames(), new ArrayList<String>());
+			if(args.length ==2){
+				return StringUtil.copyPartialMatches(args[1], plugin.getEventNames(), new ArrayList<String>());
+			}
 		}
 		
 		return ImmutableList.of();
