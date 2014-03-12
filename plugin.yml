@@ -1,0 +1,8 @@
+name: EventPlugin
+main: com.nqeron.eventplugin.EventPlugin
+version: 0.0.1
+
+commands:
+  event:
+    description: event related commands
+    usage: /<command>
