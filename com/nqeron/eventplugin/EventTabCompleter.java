@@ -13,7 +13,7 @@ import com.google.common.collect.ImmutableList;
 
 public class EventTabCompleter implements TabCompleter{
 	
-	private static final List<String> MAIN_CHOICES = ImmutableList.of("create", "setLocation","setTime");
+	private static final List<String> MAIN_CHOICES = ImmutableList.of("create", "setLocation","setTime","list");
 	
 	private EventPlugin plugin;
 	

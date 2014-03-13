@@ -6,3 +6,6 @@ commands:
   event:
     description: event related commands
     usage: /<command>
+  now:
+    description: returns date/time for server
+    usage: /<command>

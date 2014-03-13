@@ -32,8 +32,25 @@ public class EventCommands implements CommandExecutor{
 			case "create": return createEvent(sender,args);
 			case "setLocation": return setLocation(sender,args);
 			case "setTime": return setTime(sender,args);
+			case "list": return listEvents(sender,args);
 		}
 		return false;
+	}
+
+	private boolean listEvents(CommandSender sender, String[] args) {
+		List<String> events = plugin.getEventNames();
+		if (events.size() == 0){
+			sender.sendMessage("No events created!");
+			return true;
+		}
+		
+		StringBuilder str = new StringBuilder();
+		for(String event : events){
+			str.append(event);
+			if (!events.get(events.size()-1).equals(event)){ str.append(", "); }
+		}
+		sender.sendMessage(str.toString());
+		return true;
 	}
 
 	private boolean setTime(CommandSender sender, String[] args) {
@@ -57,6 +74,7 @@ public class EventCommands implements CommandExecutor{
 			 date = dateParser.parse(args[2]);
 			 String timeString = args[3];
 			 if(args.length == 5){ timeString += " " + args[4]; }
+			 else{ timeString += " am";}
 			 date.setTime( timeParser.parse(timeString).getTime() );
 			 
 		} catch (ParseException e1) {

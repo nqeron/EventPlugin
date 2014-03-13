@@ -12,25 +12,29 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class EventPlugin extends JavaPlugin{
 	HashMap<String,Event> events = new HashMap<String,Event>();
 	
+	GeneralCommands genExecutor = new GeneralCommands();
 	
 	public void onEnable() {
 		//read and setup config
 		//read and setup events
+		
 		getLogger().info("Event Plugin enabled");
 		getServer().getPluginManager().registerEvents(new EventsListeners(), this);
 		
 		getCommand("event").setExecutor(new EventCommands(this));
 		getCommand("event").setTabCompleter(new EventTabCompleter(this));
+		
 	}
 	public void onDisable(){
 		//save config changes
 		//save event changes
 		//clean-up
 	}
+	
 	public boolean onCommand(CommandSender sender, Command command,String label, String[] args) {
-		return false;
-		//return executor.onCommand(sender, command, label, args);
+		return genExecutor.onCommand(sender, command, label, args);
 	}
+	
 	public boolean addEvent(String name) {
 		if(events.containsKey(name)){
 			return false;
