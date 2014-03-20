@@ -1,5 +1,6 @@
 package com.nqeron.eventplugin;
 
+import java.text.DateFormat;
 import java.util.Date;
 
 import org.bukkit.Location;
@@ -19,7 +20,6 @@ public class Event {
 	}
 
 	public String getName() {
-		// TODO Auto-generated method stub
 		return name;
 	}
 	
@@ -33,6 +33,23 @@ public class Event {
 	
 	public Date getDate(){
 		return date;
+	}
+	
+	@Override
+	public String toString() {
+		DateFormat dFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+		
+		String dateString = "no date set";
+		if (date != null){
+			dateString = dFormat.format(date);
+		}
+		
+		String locString = "no location set";
+		if(loc != null){
+			locString = loc.toString();
+		}
+		
+	    return String.format("%s:  date: %s, location: %s", name, dateString, locString);
 	}
 
 }

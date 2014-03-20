@@ -3,6 +3,7 @@ package com.nqeron.eventplugin;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -38,16 +39,36 @@ public class EventCommands implements CommandExecutor{
 	}
 
 	private boolean listEvents(CommandSender sender, String[] args) {
-		List<String> events = plugin.getEventNames();
+		Collection<Event> events = plugin.getEvents();
 		if (events.size() == 0){
 			sender.sendMessage("No events created!");
 			return true;
 		}
 		
+		boolean showDetails = false;
+		if(args.length >= 2 && "-a".equals(args[1])){
+			showDetails = true;
+		}
+		
 		StringBuilder str = new StringBuilder();
-		for(String event : events){
-			str.append(event);
-			if (!events.get(events.size()-1).equals(event)){ str.append(", "); }
+		
+		for(Event event : events){
+			
+			if(showDetails){
+				str.append(event.toString());
+			}else{
+				str.append(event.getName());
+			}
+			
+			//TODO get list events to stop delimiting after last event
+			//if (!events.get(events.size()-1).equals(event)){
+				
+				if(showDetails){
+					str.append("\n");
+				}else{
+					str.append(", ");
+				}
+			//}
 		}
 		sender.sendMessage(str.toString());
 		return true;
@@ -67,22 +88,18 @@ public class EventCommands implements CommandExecutor{
 			return true;
 		}
 		
-		DateFormat dateParser = DateFormat.getDateInstance(DateFormat.SHORT);
-		DateFormat timeParser = DateFormat.getTimeInstance(DateFormat.SHORT);
+		DateFormat datetimeParser = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
 		Date date;
 		try {
-			 date = dateParser.parse(args[2]);
-			 String timeString = args[3];
-			 if(args.length == 5){ timeString += " " + args[4]; }
-			 else{ timeString += " am";}
-			 date.setTime( timeParser.parse(timeString).getTime() );
+			 String datetimeString = args[2] + " "+ args[3];
+			 if(args.length == 5){ datetimeString += " " + args[4]; }
+			 else{ datetimeString += " am";}
+			 date =  datetimeParser.parse(datetimeString);
 			 
 		} catch (ParseException e1) {
-			// TODO Auto-generated catch block
 			sender.sendMessage("Could not parse date/time. The proper format is:");
 			date = new Date();
-			sender.sendMessage("Date: " + dateParser.format(date));
-			sender.sendMessage("Time: " + timeParser.format(date));
+			sender.sendMessage(datetimeParser.format(date));
 			return true;
 		}
 		
