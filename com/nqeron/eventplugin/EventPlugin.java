@@ -4,21 +4,30 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.scheduler.BukkitTask;
 
 public class EventPlugin extends JavaPlugin{
-	HashMap<String,Event> events = new HashMap<String,Event>();
+	HashMap<String,Event> events;
 	EventLoader loader;
 	
-	GeneralCommands genExecutor = new GeneralCommands();
+	GeneralCommands genExecutor;
+	BukkitScheduler scheduler;
 	
 	public void onEnable() {
+		events = new HashMap<String,Event>();
+		genExecutor = new GeneralCommands();
+		scheduler = getServer().getScheduler();
+		
 		loadEvents(); //read and setup events
+		setupNotifications(); //set up notifications for loaded events
 		
 		//read and setup config
 		
@@ -29,18 +38,35 @@ public class EventPlugin extends JavaPlugin{
 		getCommand("event").setTabCompleter(new EventTabCompleter(this));
 		
 	}
-	
+
 	public void onDisable(){
 		//save config changes
 		//save event changes
 		saveEvents();
+		clearNotifications(); //clean up notifications that haven't been set
 		
 		//clean-up
 		loader = null;
 		genExecutor = null;
 		events = null;
+		scheduler = null;
 	}
 	
+	private void setupNotifications() {
+		for (Event event : events.values()){
+			for(Date alert: event.getNotifications()){
+				Integer t = scheduleNotification(alert, event);
+				event.addNotificationID(t);
+			}
+		}
+	}
+	
+	private void clearNotifications() {
+		// TODO Auto-generated method stub
+		scheduler.cancelAllTasks();
+		
+	}
+
 	private void saveEvents() {
 		try {
 			loader.saveEvents(events.values());
@@ -99,5 +125,30 @@ public class EventPlugin extends JavaPlugin{
 
 	public Collection<Event> getEvents() {
 		return events.values();
+	}
+
+	public Integer scheduleNotification(final Date date, final Event event) {
+		Date now = new Date();
+		long time = date.getTime() - now.getTime(); //calculate time as ms from now
+		time /= 50; //convert milliseconds --> ticks
+		
+		BukkitTask t =scheduler.runTaskLater(this, new Runnable(){
+
+			@Override
+			public void run() {
+				getServer().broadcastMessage(event.getMessage());
+				event.removeNotification(date);
+				
+			}
+			}, time);
+		return t.getTaskId();
+	}
+
+	public void deleteEvent(Event e) {
+		for(Integer alertID: e.getNotificationIDs()){
+			scheduler.cancelTask(alertID);
+		}
+		events.remove(e.getName());
+		e = null; //remove e from the game
 	}
 }
